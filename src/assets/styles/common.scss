@@ -1,0 +1,63 @@
+/* 页面通用布局样式 */
+.page-container {
+  padding: 20px;
+  
+  .page-header {
+    margin-bottom: 20px;
+  }
+}
+
+/* 卡片布局样式 */
+.card-container {
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      
+      .el-input {
+        width: 200px;
+        margin-right: 10px;
+      }
+      
+      .el-button + .el-button {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+/* 表格样式优化 */
+.el-table {
+  margin-top: 20px;
+  
+  .el-button--mini {
+    padding: 4px 12px;
+  }
+}
+
+/* 分页样式 */
+.pagination-container {
+  margin-top: 20px;
+  text-align: right;
+}
+
+/* 搜索区域样式 */
+.search-container {
+  .el-input {
+    width: 200px;
+  }
+  
+  .search-buttons {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}

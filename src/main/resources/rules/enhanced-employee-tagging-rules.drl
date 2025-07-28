@@ -1,0 +1,27 @@
+package rules
+
+import com.rizhaosteel.droolstest.model.entity.Employee
+
+// 高级开发者标签规则
+rule "高级开发者标签"
+    when
+        $employee : Employee(yearsOfExperience >= 5)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：高级开发者");
+end
+
+// 中级开发者标签规则
+rule "中级开发者标签"
+    when
+        $employee : Employee(yearsOfExperience >= 2 && yearsOfExperience < 5)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：中级开发者");
+end
+
+// 初级开发者标签规则
+rule "初级开发者标签"
+    when
+        $employee : Employee(yearsOfExperience < 2)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：初级开发者");
+end

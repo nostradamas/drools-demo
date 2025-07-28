@@ -1,0 +1,99 @@
+<html>
+  <head>
+    <title>测试</title>
+  </head>
+  <body>
+     <div id="app">
+        <div >
+            <template>
+                <el-card shadow="never" class="form-card">
+                    <el-form ref="documentForm" :model="documentForm" :rules="documentRules"
+                                label-width="120px">
+                        <el-form-item>
+                            <el-button @click="resetForm">重置</el-button>
+                            <el-button type="success" @click="saveDocument">保存文档</el-button>
+                            <el-button type="success" @click="downLoadDocument">下载文档</el-button>
+                        </el-form-item>
+                        <el-form-item label="示例字段1" prop="field1">
+                            <el-input v-model="documentForm.field1"></el-input>
+                        </el-form-item>
+                        <el-form-item label="示例字段2" prop="field2">
+                            <el-input v-model="documentForm.field2"></el-input>
+                        </el-form-item>
+                    </el-form>
+                </el-card>
+                <el-card shadow="never" class="iframe-card">
+                    <div class="iframe-container">
+                        <iframe
+                                :src="iframeSrc"
+                                title="文档编辑"
+                                width="100%"
+                                height="1000px"
+                                frameborder="0"
+                                ref="documentIframe"
+                        ></iframe>
+                    </div>
+                </el-card>
+            </template>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.js"></script>
+    // 引入element-Ui
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <script>
+      // 创建vue 实例
+      var app = new Vue({
+        el: "#app",
+        data: {
+          message: "Hello World!",
+          iframeSrc: 'http://10.9.225.1:6088/#/commonDocEdit?tempId=984852461837733888&appId=984852462240387072&token=1&documentId='
+        , documentForm: {
+            field1: "",
+            field2: "",
+          },
+          documentRules: {
+            field1: [
+              { required: true, message: "请输入字段1", trigger: "blur" },
+            ],
+            field2: [
+              { required: true, message: "请输入字段2", trigger: "blur" },
+            ],
+          },
+          documentId: "",
+
+        },
+        methods: {
+            resetForm() {
+                this.$refs.documentForm.resetFields();
+            },
+            saveDocument() { 
+                   const iframe = this.$refs.documentIframe;
+                if (iframe) {
+                    this.$refs.documentForm.validate((valid) => {
+                    if (valid) {
+                        iframe.contentWindow.postMessage({
+                        type: 'saveDocument',
+                        data: this.documentForm
+                        }, '*');
+                        this.$message.info('正在保存文档...');
+                    } else {
+                        this.$message.error('请填写完整表单');
+                    }
+                    });
+                } else {
+                    this.$message.error('无法连接到文档编辑器');
+                }
+            },
+            downLoadDocument() {
+                var iframe = this.$refs.documentIframe;
+                var iframeDoc = iframe.contentWindow.document;
+                var iframeBody = iframeDoc.body;
+                var iframeHtml = iframeBody.innerHTML;
+                var blob = new Blob([iframeHtml], { type: "text/html" });
+                var url = URL.createObjectURL(blob);
+            }
+        },
+      });
+    </script>
+  </body>
+</html>

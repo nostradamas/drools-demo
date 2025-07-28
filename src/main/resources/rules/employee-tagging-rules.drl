@@ -1,0 +1,86 @@
+package rules
+
+import com.rizhaosteel.droolstest.model.entity.Employee
+
+// 高级开发者标签规则
+rule "Tag Senior Developer"
+    when
+        $employee : Employee(yearsOfExperience >= 5)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：高级开发者");
+end
+
+// 初级开发者标签规则
+rule "Tag Junior Developer"
+    when
+        $employee : Employee(yearsOfExperience < 2)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：初级开发者");
+end
+
+// 中级开发者标签规则
+rule "Tag Mid-level Developer"
+    when
+        $employee : Employee(yearsOfExperience >= 2 && yearsOfExperience < 5)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：中级开发者");
+end
+
+// 技术专家标签规则
+rule "Tag Technical Expert"
+    when
+        $employee : Employee(yearsOfExperience >= 8)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：技术专家");
+end
+
+// 管理潜质标签规则
+rule "Tag Management Potential"
+    when
+        $employee : Employee(yearsOfExperience >= 3)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：管理潜质");
+end
+
+// 全栈开发者标签规则
+rule "Tag Full Stack Developer"
+    when
+        $employee : Employee(skills contains "Java" && skills contains "JavaScript" &&
+                           skills contains "数据库")
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：全栈开发者");
+end
+
+// 前端专家标签规则
+rule "Tag Frontend Expert"
+    when
+        $employee : Employee((skills contains "React" || skills contains "Vue" || skills contains "Angular") &&
+                           skills contains "JavaScript" && skills contains "CSS")
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：前端专家");
+end
+
+// 后端专家标签规则
+rule "Tag Backend Expert"
+    when
+        $employee : Employee((skills contains "Java" || skills contains "Python" || skills contains "Go") &&
+                           skills contains "数据库" && skills contains "微服务")
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：后端专家");
+end
+
+// 高潜力员工标签规则 - 已移除对不存在属性的引用
+rule "Tag High Potential"
+    when
+        $employee : Employee(yearsOfExperience >= 2)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：高潜力员工");
+end
+
+// 需要培训标签规则
+rule "Tag Needs Training"
+    when
+        $employee : Employee(yearsOfExperience >= 1)
+    then
+        System.out.println("员工 " + $employee.getName() + " 被标记为：需要培训");
+end
