@@ -11,7 +11,8 @@ public class Employee {
     private int workExperience; // 工作经验年数
     private List<String> skills; // 技能列表
     private String currentPosition; // 当前职位
-    private double salary; // 期望薪资
+    private double currentSalary; // 当前薪资
+    private double expectedSalary; // 期望薪资
     private List<String> tags; // 标签列表
     private int performanceScore; // 绩效分数 (1-100)
     private boolean hasManagementExperience; // 是否有管理经验
@@ -23,7 +24,8 @@ public class Employee {
     
     public Employee(Long id, String name, int age, String education, 
                    int workExperience, List<String> skills, String currentPosition, 
-                   double salary, int performanceScore, boolean hasManagementExperience) {
+                   double currentSalary, double expectedSalary, int performanceScore, 
+                   boolean hasManagementExperience) {
         this.id = id;
         this.name = name;
         this.age = age;
@@ -31,43 +33,104 @@ public class Employee {
         this.workExperience = workExperience;
         this.skills = skills != null ? skills : new ArrayList<>();
         this.currentPosition = currentPosition;
-        this.salary = salary;
+        this.currentSalary = currentSalary;
+        this.expectedSalary = expectedSalary;
         this.tags = new ArrayList<>();
         this.performanceScore = performanceScore;
         this.hasManagementExperience = hasManagementExperience;
     }
-    
+
+
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    
-    public int getAge() { return age; }
-    public void setAge(int age) { this.age = age; }
-    
-    public String getEducation() { return education; }
-    public void setEducation(String education) { this.education = education; }
-    
-    public int getWorkExperience() { return workExperience; }
-    public void setWorkExperience(int workExperience) { this.workExperience = workExperience; }
-    
-    public List<String> getSkills() { return skills; }
-    public void setSkills(List<String> skills) { this.skills = skills; }
-    
-    public String getCurrentPosition() { return currentPosition; }
-    public void setCurrentPosition(String currentPosition) { this.currentPosition = currentPosition; }
-    
-    public double getSalary() { return salary; }
-    public void setSalary(double salary) { this.salary = salary; }
-    
-    public List<String> getTags() { return tags; }
-    public void setTags(List<String> tags) { this.tags = tags; }
-    
-    public int getPerformanceScore() { return performanceScore; }
-    public void setPerformanceScore(int performanceScore) { this.performanceScore = performanceScore; }
-    
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public String getEducation() {
+        return education;
+    }
+
+    public void setEducation(String education) {
+        this.education = education;
+    }
+
+    public int getWorkExperience() {
+        return workExperience;
+    }
+
+    public void setWorkExperience(int workExperience) {
+        this.workExperience = workExperience;
+    }
+
+    public List<String> getSkills() {
+        return skills;
+    }
+
+    public void setSkills(List<String> skills) {
+        this.skills = skills;
+    }
+
+    public String getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public void setCurrentPosition(String currentPosition) {
+        this.currentPosition = currentPosition;
+    }
+
+    public double getCurrentSalary() {
+        return currentSalary;
+    }
+
+    public void setCurrentSalary(double currentSalary) {
+        this.currentSalary = currentSalary;
+    }
+
+    public double getExpectedSalary() {
+        return expectedSalary;
+    }
+
+    public void setExpectedSalary(double expectedSalary) {
+        this.expectedSalary = expectedSalary;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
+    public int getPerformanceScore() {
+        return performanceScore;
+    }
+
+    public void setPerformanceScore(int performanceScore) {
+        this.performanceScore = performanceScore;
+    }
+
     public boolean isHasManagementExperience() { return hasManagementExperience; }
     public void setHasManagementExperience(boolean hasManagementExperience) { this.hasManagementExperience = hasManagementExperience; }
     

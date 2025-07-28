@@ -1,0 +1,309 @@
+package rules
+
+import com.rizhaosteel.droolstest.matching.model.Employee
+import com.rizhaosteel.droolstest.matching.model.Position
+import com.rizhaosteel.droolstest.matching.model.MatchingResult
+import java.util.List
+
+// 基础工作经验匹配规则
+rule "工作经验匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval($employee.getWorkExperience() >= $position.getMinExperience() && 
+             $employee.getWorkExperience() <= $position.getMaxExperience())
+    then
+        $result.addScore(20);
+        $result.addMatchReason("工作经验符合要求：" + $employee.getWorkExperience() + "年");
+        System.out.println("员工 " + $employee.getName() + " 工作经验匹配职位 " + $position.getTitle());
+end
+
+// 工作经验不匹配规则
+rule "工作经验不匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval($employee.getWorkExperience() < $position.getMinExperience() || 
+             $employee.getWorkExperience() > $position.getMaxExperience())
+    then
+        $result.addMismatchReason("工作经验不符合：需要" + $position.getMinExperience() + 
+                                 "-" + $position.getMaxExperience() + "年，实际" + $employee.getWorkExperience() + "年");
+        System.out.println("员工 " + $employee.getName() + " 工作经验不匹配职位 " + $position.getTitle());
+end
+
+// 必需技能匹配规则
+rule "必需技能完全匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval(hasAllRequiredSkills($employee.getSkills(), $position.getRequiredSkills()))
+    then
+        $result.addScore(30);
+        $result.addMatchReason("完全掌握所有必需技能");
+        System.out.println("员工 " + $employee.getName() + " 完全掌握职位 " + $position.getTitle() + " 的必需技能");
+end
+
+// 必需技能部分匹配规则
+rule "必需技能部分匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval(!hasAllRequiredSkills($employee.getSkills(), $position.getRequiredSkills()) &&
+             getSkillMatchCount($employee.getSkills(), $position.getRequiredSkills()) > 0)
+    then
+        int matchCount = getSkillMatchCount($employee.getSkills(), $position.getRequiredSkills());
+        int totalRequired = $position.getRequiredSkills().size();
+        double score = (double)matchCount / totalRequired * 20;
+        $result.addScore(score);
+        $result.addMatchReason("部分掌握必需技能：" + matchCount + "/" + totalRequired);
+        System.out.println("员工 " + $employee.getName() + " 部分掌握职位 " + $position.getTitle() + " 的必需技能");
+end
+
+// 必需技能缺失规则
+rule "必需技能缺失"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval(getSkillMatchCount($employee.getSkills(), $position.getRequiredSkills()) == 0)
+    then
+        $result.addMismatchReason("缺少所有必需技能");
+        System.out.println("员工 " + $employee.getName() + " 缺少职位 " + $position.getTitle() + " 的必需技能");
+end
+
+// 优选技能匹配规则
+rule "优选技能匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval(getSkillMatchCount($employee.getSkills(), $position.getPreferredSkills()) > 0)
+    then
+        int matchCount = getSkillMatchCount($employee.getSkills(), $position.getPreferredSkills());
+        int totalPreferred = $position.getPreferredSkills().size();
+        double score = (double)matchCount / totalPreferred * 15;
+        $result.addScore(score);
+        $result.addMatchReason("掌握优选技能：" + matchCount + "/" + totalPreferred);
+        System.out.println("员工 " + $employee.getName() + " 掌握职位 " + $position.getTitle() + " 的优选技能");
+end
+
+// 学历匹配规则
+rule "学历匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval(isEducationMatch($employee.getEducation(), $position.getMinEducation()))
+    then
+        $result.addScore(15);
+        $result.addMatchReason("学历符合要求：" + $employee.getEducation());
+        System.out.println("员工 " + $employee.getName() + " 学历匹配职位 " + $position.getTitle());
+end
+
+// 学历不匹配规则
+rule "学历不匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval(!isEducationMatch($employee.getEducation(), $position.getMinEducation()))
+    then
+        $result.addMismatchReason("学历不符合：需要" + $position.getMinEducation() + "，实际" + $employee.getEducation());
+        System.out.println("员工 " + $employee.getName() + " 学历不匹配职位 " + $position.getTitle());
+end
+
+// 薪资期望匹配规则
+rule "薪资期望匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval($employee.getExpectedSalary() >= $position.getMinSalary() && 
+             $employee.getExpectedSalary() <= $position.getMaxSalary())
+    then
+        $result.addScore(10);
+        $result.addMatchReason("薪资期望合理：" + $employee.getExpectedSalary());
+        System.out.println("员工 " + $employee.getName() + " 薪资期望匹配职位 " + $position.getTitle());
+end
+
+// 薪资期望过高规则
+rule "薪资期望过高"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval($employee.getExpectedSalary() > $position.getMaxSalary())
+    then
+        $result.addMismatchReason("薪资期望过高：期望" + $employee.getExpectedSalary() + 
+                                 "，上限" + $position.getMaxSalary());
+        System.out.println("员工 " + $employee.getName() + " 薪资期望过高，不匹配职位 " + $position.getTitle());
+end
+
+// 管理经验匹配规则
+rule "管理经验匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval($position.isRequiresManagement() && $employee.isHasManagementExperience())
+    then
+        $result.addScore(10);
+        $result.addMatchReason("具备管理经验");
+        System.out.println("员工 " + $employee.getName() + " 具备管理经验，匹配职位 " + $position.getTitle());
+end
+
+// 管理经验缺失规则
+rule "管理经验缺失"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval($position.isRequiresManagement() && !$employee.isHasManagementExperience())
+    then
+        $result.addMismatchReason("缺少管理经验");
+        System.out.println("员工 " + $employee.getName() + " 缺少管理经验，不匹配职位 " + $position.getTitle());
+end
+
+// 绩效分数加分规则
+rule "高绩效加分"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        eval($employee.getPerformanceScore() >= 85)
+    then
+        $result.addScore(5);
+        $result.addMatchReason("绩效优秀：" + $employee.getPerformanceScore() + "分");
+        System.out.println("员工 " + $employee.getName() + " 绩效优秀，获得加分");
+end
+
+// 职位级别匹配规则
+rule "初级职位匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval("初级".equals($position.getLevel()) && $employee.getWorkExperience() <= 2)
+    then
+        $result.addScore(5);
+        $result.addMatchReason("适合初级职位");
+        System.out.println("员工 " + $employee.getName() + " 适合初级职位 " + $position.getTitle());
+end
+
+rule "中级职位匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval("中级".equals($position.getLevel()) && 
+             $employee.getWorkExperience() >= 2 && $employee.getWorkExperience() <= 5)
+    then
+        $result.addScore(5);
+        $result.addMatchReason("适合中级职位");
+        System.out.println("员工 " + $employee.getName() + " 适合中级职位 " + $position.getTitle());
+end
+
+rule "高级职位匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval("高级".equals($position.getLevel()) && $employee.getWorkExperience() >= 5)
+    then
+        $result.addScore(5);
+        $result.addMatchReason("适合高级职位");
+        System.out.println("员工 " + $employee.getName() + " 适合高级职位 " + $position.getTitle());
+end
+
+rule "专家职位匹配"
+    when
+        $result : MatchingResult()
+        $employee : Employee() from $result.getEmployee()
+        $position : Position() from $result.getPosition()
+        eval("专家".equals($position.getLevel()) && $employee.getWorkExperience() >= 8)
+    then
+        $result.addScore(5);
+        $result.addMatchReason("适合专家职位");
+        System.out.println("员工 " + $employee.getName() + " 适合专家职位 " + $position.getTitle());
+end
+
+// 最终推荐规则
+rule "高度推荐"
+    when
+        $result : MatchingResult(matchScore >= 80)
+    then
+        $result.setRecommended(true);
+        $result.setRecommendation("强烈推荐：匹配度很高");
+        System.out.println("员工 " + $result.getEmployee().getName() + " 强烈推荐职位 " + $result.getPosition().getTitle());
+end
+
+rule "一般推荐"
+    when
+        $result : MatchingResult(matchScore >= 60 && matchScore < 80)
+    then
+        $result.setRecommended(true);
+        $result.setRecommendation("一般推荐：基本符合要求");
+        System.out.println("员工 " + $result.getEmployee().getName() + " 一般推荐职位 " + $result.getPosition().getTitle());
+end
+
+rule "不推荐"
+    when
+        $result : MatchingResult(matchScore < 60)
+    then
+        $result.setRecommended(false);
+        $result.setRecommendation("不推荐：匹配度较低");
+        System.out.println("员工 " + $result.getEmployee().getName() + " 不推荐职位 " + $result.getPosition().getTitle());
+end
+
+// 辅助函数定义
+function boolean hasAllRequiredSkills(List<String> employeeSkills, List<String> requiredSkills) {
+    if (requiredSkills == null || requiredSkills.isEmpty()) {
+        return true;
+    }
+    for (String skill : requiredSkills) {
+        if (!employeeSkills.contains(skill)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function int getSkillMatchCount(List<String> employeeSkills, List<String> targetSkills) {
+    if (targetSkills == null || targetSkills.isEmpty()) {
+        return 0;
+    }
+    int count = 0;
+    for (String skill : targetSkills) {
+        if (employeeSkills.contains(skill)) {
+            count++;
+        }
+    }
+    return count;
+}
+
+function boolean isEducationMatch(String employeeEducation, String minEducation) {
+    if (minEducation == null || minEducation.isEmpty()) {
+        return true;
+    }
+    
+    // 学历等级映射
+    int employeeLevel = getEducationLevel(employeeEducation);
+    int minLevel = getEducationLevel(minEducation);
+    
+    return employeeLevel >= minLevel;
+}
+
+function int getEducationLevel(String education) {
+    if (education == null) return 0;
+    switch (education) {
+        case "高中": return 1;
+        case "大专": return 2;
+        case "本科": return 3;
+        case "硕士": return 4;
+        case "博士": return 5;
+        default: return 0;
+    }
+}
